@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 7 - Az Aranykor Operációs Rendszere</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&family=Consolas:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --win-blue: #0078d7;
+            --win-light-blue: #00bcf2;
+            --win-green: #107c10;
+            --win-orange: #f7630c;
+            --win-gray: #f2f2f2;
+            --win-dark: #1d1d1d;
+            --win-border: #d2d2d2;
+            --win-taskbar: #1a1a1a;
+            --win-start: #0c5ca0;
+            --win-aero: rgba(255, 255, 255, 0.9);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: var(--win-gray);
+            background-image: linear-gradient(to bottom, #e6f2ff, #f0f5ff, var(--win-gray));
+            min-height: 100vh;
+        }
+        
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            color: var(--win-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Windows 7 Stílusú Header */
+        .win-header {
+            background: linear-gradient(to bottom, var(--win-blue), #005a9e);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .logo-icon {
+            margin-right: 15px;
+            font-size: 2.5rem;
+            color: white;
+        }
+        
+        .win-nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        .win-nav ul li {
+            margin-left: 25px;
+        }
+        
+        .win-nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        
+        .win-nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Windows 7 Start Menu stílusú fő rész */
+        .win-hero {
+            padding: 60px 0;
+            background-color: white;
+            border-radius: 5px;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--win-border);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .win-hero:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--win-blue), var(--win-light-blue), var(--win-green));
+        }
+        
+        .hero-content {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        .hero-text {
+            flex: 1;
+        }
+        
+        .hero-text h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            color: var(--win-blue);
+        }
+        
+        .hero-text p {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            color: #555;
+        }
+        
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .win7-screenshot {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--win-border);
+        }
+        
+        /* Windows 7 jellegű gombok */
+        .win-btn {
+            display: inline-block;
+            background: linear-gradient(to bottom, var(--win-blue), #005a9e);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 3px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .win-btn:hover {
+            background: linear-gradient(to bottom, #0088ff, #0066cc);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        .win-btn.green {
+            background: linear-gradient(to bottom, var(--win-green), #0a6b0a);
+        }
+        
+        .win-btn.green:hover {
+            background: linear-gradient(to bottom, #128712, #085408);
+        }
+        
+        /* Windows Aero stílusú szekciók */
+        .aero-section {
+            background-color: var(--win-aero);
+            backdrop-filter: blur(10px);
+            border-radius: 5px;
+            padding: 40px;
+            margin: 40px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .aero-section:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, transparent, rgba(0, 120, 215, 0.3), transparent);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-size: 2.2rem;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            background-color: var(--win-blue);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* Funkciók rész */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 5px;
+            padding: 30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--win-border);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--win-blue);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--win-blue);
+        }
+        
+        /* Verziók rész */
+        .versions-timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            width: 4px;
+            height: 100%;
+            background-color: var(--win-blue);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .timeline-item:nth-child(odd) {
+            flex-direction: row;
+        }
+        
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+        
+        .timeline-content {
+            flex: 1;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--win-border);
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--win-blue);
+            border-radius: 50%;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        
+        /* Windows 7 asztal szimuláció */
+        .desktop-simulator {
+            background-color: #0078d7;
+            background-image: linear-gradient(rgba(0, 120, 215, 0.9), rgba(0, 120, 215, 0.7)), url('https://images.unsplash.com/photo-1542281286-9e0a16bb7366?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 5px;
+            padding: 40px;
+            margin: 40px 0;
+            color: white;
+            text-align: center;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .desktop-icons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .desktop-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .desktop-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .icon-img {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+            color: var(--win-blue);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Windows 7 taskbar szimuláció */
+        .taskbar-sim {
+            background-color: var(--win-taskbar);
+            border-radius: 5px;
+            padding: 15px;
+            margin: 40px 0;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .start-button {
+            background: linear-gradient(to bottom, var(--win-start), #0a4a7a);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            margin-right: 20px;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.3);
+        }
+        
+        .start-button i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .taskbar-icons {
+            display: flex;
+            flex: 1;
+            gap: 15px;
+        }
+        
+        .taskbar-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .taskbar-icon:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .system-tray {
+            display: flex;
+            align-items: center;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        /* Windows 7 jellemzők interaktív rész */
+        .interactive-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .interactive-card {
+            background-color: white;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--win-border);
+            transition: transform 0.3s;
+        }
+        
+        .interactive-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .interactive-header {
+            background: linear-gradient(to right, var(--win-blue), var(--win-light-blue));
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .interactive-header i {
+            font-size: 1.8rem;
+            margin-right: 15px;
+        }
+        
+        .interactive-body {
+            padding: 20px;
+        }
+        
+        /* Windows 7 emulátor rész */
+        .emulator-section {
+            background-color: #1d1d1d;
+            border-radius: 5px;
+            padding: 30px;
+            margin: 40px 0;
+            color: white;
+        }
+        
+        .emulator-window {
+            background-color: #2d2d2d;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+        
+        .window-titlebar {
+            background-color: #3d3d3d;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+        }
+        
+        .window-title {
+            font-weight: 600;
+        }
+        
+        .window-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .window-control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .window-control.close {
+            background-color: #ff5f56;
+        }
+        
+        .window-control.minimize {
+            background-color: #ffbd2e;
+        }
+        
+        .window-control.maximize {
+            background-color: #27ca3f;
+        }
+        
+        .window-content {
+            padding: 20px;
+            font-family: 'Consolas', monospace;
+            min-height: 200px;
+            overflow: auto;
+        }
+        
+        .command-line {
+            color: #0af20a;
+        }
+        
+        /* Footer */
+        .win-footer {
+            background-color: var(--win-dark);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+        
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .footer-logo i {
+            margin-right: 10px;
+            color: var(--win-light-blue);
+        }
+        
+        .footer-links h4 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links ul li a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links ul li a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero-content {
+                flex-direction: column;
+            }
+            
+            .hero-text h1 {
+                font-size: 2.2rem;
+            }
+            
+            .timeline-line {
+                left: 30px;
+            }
+            
+            .timeline-item {
+                flex-direction: row !important;
+            }
+            
+            .timeline-dot {
+                left: 30px;
+            }
+            
+            .timeline-content {
+                margin-left: 50px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+            }
+            
+            .logo {
+                margin-bottom: 20px;
+            }
+            
+            .win-nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .win-nav ul li {
+                margin: 5px 10px;
+            }
+            
+            .taskbar-sim {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .start-button {
+                margin-bottom: 10px;
+                margin-right: 0;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* Animációk */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Windows 7 Header -->
+    <header class="win-header">
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fab fa-windows logo-icon"></i>
+                <span>Windows 7</span>
+            </div>
+            <nav class="win-nav">
+                <ul>
+                    <li><a href="#tortenet">Történet</a></li>
+                    <li><a href="#funkciok">Jellemzők</a></li>
+                    <li><a href="#verziok">Verziók</a></li>
+                    <li><a href="#ikonok">Ikonikus elemek</a></li>
+                    <li><a href="#emulator">Emulátor</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Fő tartalom -->
+    <main class="container">
+        <!-- Hero rész -->
+        <section class="win-hero fade-in">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Windows 7</h1>
+                    <p>A Microsoft egyik legnépszerűbb operációs rendszere, amely 2009 októberében jelent meg. A Windows Vista utódjaként a Windows 7 jelentős fejlődést hozott a felhasználói élmény, a stabilitás és a teljesítmény terén.</p>
+                    <p>Az "Aero" felület, az új taskbar, a javított fájlkezelő és számos egyéb innováció tette a Windows 7-et a számítástechnika történetének egyik legkedveltebb operációs rendszerévé.</p>
+                    <div style="margin-top: 30px;">
+                        <a href="#tortenet" class="win-btn">További információ</a>
+                        <a href="#emulator" class="win-btn green" style="margin-left: 15px;">Windows 7 élmény</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Windows_7_logo.svg/1200px-Windows_7_logo.svg.png" alt="Windows 7 Logo" class="win7-screenshot" style="max-width: 300px;">
+                </div>
+            </div>
+        </section>
+
+        <!-- Történet -->
+        <section id="tortenet" class="aero-section fade-in">
+            <div class="section-title">
+                <h2>A Windows 7 Története</h2>
+            </div>
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h3>Egy Sikerstory</h3>
+                    <p>A Windows 7 fejlesztése a Windows Vista megjelenése után kezdődött, amely számos kritikát kapott a teljesítménye és kompatibilitási problémái miatt. A Microsoft célja egy stabilabb, gyorsabb és felhasználóbarátabb operációs rendszer készítése volt.</p>
+                    <p>A Windows 7 hivatalosan 2009. október 22-én jelent meg, és hamarosan a világ legnépszerűbb operációs rendszerévé vált. 2012 októberében már 670 millió licencelt példány volt forgalomban világszerte.</p>
+                    <p>2020 januárjában ért véget a hivatalos támogatás, de még ma is milliók használják szerte a világon.</p>
+                </div>
+                <div class="hero-image">
+                    <div class="icon-img" style="font-size: 3rem; width: 150px; height: 150px; background: linear-gradient(135deg, var(--win-blue), var(--win-light-blue)); color: white;">
+                        <i class="fab fa-windows"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Főbb jellemzők -->
+        <section id="funkciok" class="aero-section fade-in">
+            <div class="section-title">
+                <h2>Főbb Jellemzők</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3>Aero Felület</h3>
+                    <p>Átlátszó ablakkeretek, live thumbnails, Aero Peek és Aero Shake funkciók, amelyek forradalmasították a windows kezelését.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h3>Új Taskbar</h3>
+                    <p>A Superbar elnevezésű új taskbar lehetővé tette az alkalmazások rögzítését, a jump list-eket és az egyszerűbb ablakkezelést.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-window-restore"></i>
+                    </div>
+                    <h3>Snap Funkció</h3>
+                    <p>Az ablakok egyszerű átméretezése és pozicionálása az egér segítségével, ami jelentősen javította a multitasking élményt.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Windows 7 asztal szimuláció -->
+        <section id="ikonok" class="desktop-simulator fade-in">
+            <h2 style="color: white; font-size: 2.5rem;">Windows 7 Asztal</h2>
+            <p>A klasszikus Windows 7 asztali élmény ikonjai</p>
+            
+            <div class="desktop-icons">
+                <div class="desktop-icon" onclick="showInfo('Számítógép')">
+                    <div class="icon-img">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <span>Számítógép</span>
+                </div>
+                <div class="desktop-icon" onclick="showInfo('Dokumentumok')">
+                    <div class="icon-img">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <span>Dokumentumok</span>
+                </div>
+                <div class="desktop-icon" onclick="showInfo('Hálózat')">
+                    <div class="icon-img">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <span>Hálózat</span>
+                </div>
+                <div class="desktop-icon" onclick="showInfo('Visszanyerés')">
+                    <div class="icon-img">
+                        <i class="fas fa-recycle"></i>
+                    </div>
+                    <span>Visszanyerés</span>
+                </div>
+                <div class="desktop-icon" onclick="showInfo('Vezérlőpult')">
+                    <div class="icon-img">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <span>Vezérlőpult</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Windows 7 taskbar szimuláció -->
+        <div class="taskbar-sim fade-in">
+            <div class="start-button" onclick="openStartMenu()">
+                <i class="fab fa-windows"></i>
+                <span>Start</span>
+            </div>
+            <div class="taskbar-icons">
+                <div class="taskbar-icon" onclick="openProgram('Internet Explorer')">
+                    <i class="fab fa-internet-explorer"></i>
+                </div>
+                <div class="taskbar-icon" onclick="openProgram('Windows Media Player')">
+                    <i class="fas fa-play-circle"></i>
+                </div>
+                <div class="taskbar-icon" onclick="openProgram('Windows Explorer')">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <div class="taskbar-icon" onclick="openProgram('WordPad')">
+                    <i class="fas fa-file-word"></i>
+                </div>
+                <div class="taskbar-icon" onclick="openProgram('Paint')">
+                    <i class="fas fa-paint-brush"></i>
+                </div>
+            </div>
+            <div class="system-tray">
+                <i class="fas fa-volume-up" style="margin-right: 10px;"></i>
+                <i class="fas fa-wifi" style="margin-right: 10px;"></i>
+                <span id="clock">15:30</span>
+            </div>
+        </div>
+
+        <!-- Windows 7 verziók -->
+        <section id="verziok" class="aero-section fade-in">
+            <div class="section-title">
+                <h2>Windows 7 Verziók</h2>
+            </div>
+            <div class="versions-timeline">
+                <div class="timeline-line"></div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>Windows 7 Starter</h3>
+                        <p>Alapverzió, főleg netbookok számára. Korlátozott funkcionalitás, nincs Aero felület, nem támogatja a 64 bites architektúrát.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>Windows 7 Home Basic</h3>
+                        <p>Fejlettebb, mint a Starter, de még mindig korlátozott. Főleg fejlődő országokban forgalmazták.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>Windows 7 Home Premium</h3>
+                        <p>A legnépszerűbb otthoni verzió. Teljes Aero felület, Media Center, multimédiás funkciók.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>Windows 7 Professional</h3>
+                        <p>Kisvállalati verzió. Tartalmazza a Windows XP módot, hálózati biztonsági funkciók, tartománycsatlakozás.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>Windows 7 Ultimate</h3>
+                        <p>Legmagasabb szintű verzió. Minden funkció megtalálható, BitLocker titkosítás, több nyelv támogatása.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interaktív jellemzők -->
+        <section class="interactive-features fade-in">
+            <div class="interactive-card">
+                <div class="interactive-header">
+                    <i class="fas fa-mouse-pointer"></i>
+                    <h3>Aero Peek</h3>
+                </div>
+                <div class="interactive-body">
+                    <p>Az Aero Peek funkció lehetővé tette, hogy az egérkurzort a taskbar ikonjaira vivve előnézetet kapjunk az ablak tartalmáról.</p>
+                    <button class="win-btn" onclick="demoAeroPeek()" style="margin-top: 15px; width: 100%;">Bemutató</button>
+                </div>
+            </div>
+            
+            <div class="interactive-card">
+                <div class="interactive-header">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <h3>Snap & Shake</h3>
+                </div>
+                <div class="interactive-body">
+                    <p>Az ablakok egyszerű átméretezése képernyő széléhez húzással (Snap) és felesleges ablakok eltüntetése rázkódtatással (Shake).</p>
+                    <button class="win-btn" onclick="demoSnap()" style="margin-top: 15px; width: 100%;">Bemutató</button>
+                </div>
+            </div>
+            
+            <div class="interactive-card">
+                <div class="interactive-header">
+                    <i class="fas fa-list"></i>
+                    <h3>Jump Lists</h3>
+                </div>
+                <div class="interactive-body">
+                    <p>A jobbklikk a taskbar ikonokon megnyitotta a Jump List-et, gyors hozzáférést biztosítva a gyakran használt fájlokhoz és funkciókhoz.</p>
+                    <button class="win-btn" onclick="demoJumpList()" style="margin-top: 15px; width: 100%;">Bemutató</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Windows 7 emulátor rész -->
+        <section id="emulator" class="emulator-section fade-in">
+            <div class="section-title">
+                <h2 style="color: white;">Windows 7 Parancssor Élmény</h2>
+            </div>
+            <div class="emulator-window">
+                <div class="window-titlebar">
+                    <div class="window-title">Command Prompt - Windows 7</div>
+                    <div class="window-controls">
+                        <div class="window-control close" onclick="closeEmulator()"></div>
+                        <div class="window-control minimize" onclick="minimizeEmulator()"></div>
+                        <div class="window-control maximize" onclick="maximizeEmulator()"></div>
+                    </div>
+                </div>
+                <div class="window-content" id="cmdOutput">
+                    <p class="command-line">Microsoft Windows [Version 6.1.7601]</p>
+                    <p class="command-line">Copyright (c) 2009 Microsoft Corporation. Minden jog fenntartva.</p>
+                    <p class="command-line"><br>C:\Users\Felhasználó> <span id="cmdLine"></span><span id="cursor">_</span></p>
+                </div>
+            </div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="win-btn" onclick="runCmd('help')" style="flex: 1;">HELP</button>
+                <button class="win-btn" onclick="runCmd('ver')" style="flex: 1;">VER</button>
+                <button class="win-btn" onclick="runCmd('dir')" style="flex: 1;">DIR</button>
+                <button class="win-btn" onclick="runCmd('cls')" style="flex: 1;">CLS</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="win-footer">
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <i class="fab fa-windows"></i>
+                        <span>Windows 7</span>
+                    </div>
+                    <p>A Windows 7 egyike a Microsoft legsikeresebb operációs rendszereinek, amely generációk számára határozta meg a személyi számítástechnika élményét.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Hasznos Linkek</h4>
+                    <ul>
+                        <li><a href="https://en.wikipedia.org/wiki/Windows_7" target="_blank">Wikipedia</

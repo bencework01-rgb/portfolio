@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuszVilág - Buszos Stratégiai Játék</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #e53935;
+            --primary-blue: #1e88e5;
+            --primary-green: #43a047;
+            --primary-yellow: #ffb300;
+            --primary-orange: #fb8c00;
+            --dark-bg: #121826;
+            --light-bg: #f5f7fa;
+            --panel-bg: #1e2535;
+            --panel-light: #2a3246;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+            --road-gray: #5a6268;
+            --road-line: #ffd700;
+            --bus-red: #d32f2f;
+            --bus-blue: #1565c0;
+            --bus-green: #2e7d32;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5 {
+            font-family: 'Rubik', sans-serif;
+            font-weight: 600;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Game Header */
+        .game-header {
+            background: linear-gradient(to right, var(--primary-red), var(--primary-orange));
+            padding: 20px 0;
+            border-bottom: 5px solid var(--primary-yellow);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            font-size: 2.8rem;
+            color: white;
+            margin-right: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo-text {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .logo-text span {
+            color: var(--primary-yellow);
+        }
+        
+        .game-stats {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 8px;
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-family: 'Rubik', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-yellow);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        /* Game Container */
+        .game-container {
+            display: flex;
+            min-height: calc(100vh - 120px);
+            padding: 20px 0;
+            gap: 20px;
+        }
+        
+        /* Game Map */
+        .game-map-container {
+            flex: 3;
+            background-color: var(--panel-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            border: 3px solid var(--primary-blue);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        #gameMap {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background-color: #2c3e50;
+            background-image: 
+                linear-gradient(rgba(44, 62, 80, 0.9), rgba(44, 62, 80, 0.9)),
+                url('https://images.unsplash.com/photo-1533237264986-4d4bcaa5e648?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+        
+        /* Roads */
+        .road {
+            position: absolute;
+            background-color: var(--road-gray);
+            border-radius: 8px;
+            z-index: 1;
+        }
+        
+        .road-line {
+            position: absolute;
+            background-color: var(--road-line);
+            border-radius: 2px;
+            z-index: 2;
+        }
+        
+        /* Bus Stops */
+        .bus-stop {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s;
+        }
+        
+        .bus-stop:hover {
+            transform: scale(1.2);
+            z-index: 100;
+        }
+        
+        .bus-stop-name {
+            position: absolute;
+            bottom: -25px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        /* Buses */
+        .bus {
+            position: absolute;
+            width: 50px;
+            height: 25px;
+            border-radius: 5px;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+            transition: left 0.5s linear, top 0.5s linear;
+            transform-origin: center;
+        }
+        
+        .bus-number {
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px black;
+        }
+        
+        .bus-window {
+            position: absolute;
+            width: 12px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 2px;
+            top: 5px;
+        }
+        
+        .bus-window-1 {
+            left: 8px;
+        }
+        
+        .bus-window-2 {
+            left: 22px;
+        }
+        
+        .bus-window-3 {
+            left: 36px;
+        }
+        
+        /* Game Controls */
+        .game-controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .control-panel {
+            background-color: var(--panel-bg);
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid var(--primary-red);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-yellow);
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-red);
+            padding-bottom: 10px;
+        }
+        
+        .panel-title i {
+            margin-right: 10px;
+        }
+        
+        /* Buy Panel */
+        .buy-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .buy-btn {
+            background: linear-gradient(to right, var(--panel-light), var(--panel-bg));
+            border: 2px solid var(--primary-blue);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .buy-btn:hover {
+            background: linear-gradient(to right, var(--primary-blue), #0d47a1);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(30, 136, 229, 0.3);
+        }
+        
+        .buy-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .buy-btn.disabled:hover {
+            background: linear-gradient(to right, var(--panel-light), var(--panel-bg));
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .buy-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .buy-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .buy-price {
+            color: var(--primary-yellow);
+            font-weight: 600;
+        }
+        
+        .buy-icon {
+            font-size: 1.8rem;
+            color: var(--primary-yellow);
+        }
+        
+        /* Bus List */
+        .buses-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        
+        .bus-item {
+            background-color: var(--panel-light);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--primary-blue);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .bus-item:hover {
+            background-color: rgba(30, 136, 229, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .bus-item.active {
+            border-left-color: var(--primary-yellow);
+            background-color: rgba(255, 179, 0, 0.1);
+        }
+        
+        .bus-item-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .bus-color-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .bus-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .bus-route {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .bus-profit {
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+        
+        .bus-loss {
+            font-weight: 600;
+            color: var(--primary-red);
+        }
+        
+        /* Route Panel */
+        .route-info {
+            background-color: var(--panel-light);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .route-stops {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .route-stop {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .route-stop-icon {
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+        
+        .route-arrow {
+            color: var(--primary-yellow);
+            font-size: 1.5rem;
+        }
+        
+        .route-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .route-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Game Messages */
+        .game-messages {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: var(--panel-light);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .message {
+            padding: 10px;
+            border-left: 4px solid var(--primary-blue);
+            margin-bottom: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        
+        .message.success {
+            border-left-color: var(--primary-green);
+        }
+        
+        .message.error {
+            border-left-color: var(--primary-red);
+        }
+        
+        .message.warning {
+            border-left-color: var(--primary-yellow);
+        }
+        
+        /* Game Modal */
+        .game-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .modal-content {
+            background-color: var(--panel-bg);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 3px solid var(--primary-yellow);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--primary-yellow);
+            text-align: center;
+        }
+        
+        .modal-body {
+            margin-bottom: 30px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .modal-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Rubik', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-btn.primary {
+            background: linear-gradient(to right, var(--primary-yellow), var(--primary-orange));
+            color: var(--dark-bg);
+        }
+        
+        .modal-btn.secondary {
+            background-color: var(--panel-light);
+            color: white;
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Bus Selection */
+        .bus-selection {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .bus-option {
+            background-color: var(--panel-light);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .bus-option:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-5px);
+        }
+        
+        .bus-option.selected {
+            border-color: var(--primary-yellow);
+            background-color: rgba(255, 179, 0, 0.1);
+        }
+        
+        .bus-option-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--primary-yellow);
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 10px;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: var(--panel-light);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary-green), var(--primary-yellow));
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .game-container {
+                flex-direction: column;
+            }
+            
+            .game-map-container {
+                height: 60vh;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .logo {
+                margin-bottom: 15px;
+            }
+            
+            .game-stats {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+            
+            .stat-item {
+                min-width: 100px;
+                padding: 8px 15px;
+            }
+            
+            .bus-selection {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .stat-item {
+                min-width: 80px;
+                padding: 6px 10px;
+            }
+            
+            .stat-value {
+                font-size: 1.4rem;
+            }
+            
+            .bus-selection {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        /* Animations */
+        @keyframes busMove {
+            0% { transform: translateX(0) rotate(0deg); }
+            100% { transform: translateX(100px) rotate(0deg); }
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .blink {
+            animation: blink 1s infinite;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--panel-light);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-blue);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-red);
+        }
+    </style>
+</head>
+<body>
+    <!-- Game Header -->
+    <header class="game-header">
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-bus logo-icon"></i>
+                <div class="logo-text">Busz<span>Világ</span></div>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="money">$50,000</div>
+                    <div class="stat-label">Tőke</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="score">0</div>
+                    <div class="stat-label">Hírnév</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="buses">0</div>
+                    <div class="stat-label">Buszok</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="time">01:00</div>
+                    <div class="stat-label">Játékidő</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Container -->
+    <div class="container game-container">
+        <!-- Game Map -->
+        <div class="game-map-container">
+            <div id="gameMap">
+                <!-- Bus stops, roads, and buses will be generated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Game Controls -->
+        <div class="game-controls">
+            <!-- Buy Panel -->
+            <div class="control-panel">
+                <h3 class="panel-title"><i class="fas fa-shopping-cart"></i> Vásárlás</h3>
+                <div class="buy-options">
+                    <button class="buy-btn" id="buyBus">
+                        <div class="buy-info">
+                            <div class="buy-name">Busz vásárlása</div>
+                            <div class="buy-price">$20,000</div>
+                        </div>
+                        <i class="fas fa-bus buy-icon"></i>
+                    </button>
+                    <button class="buy-btn" id="upgradeBus">
+                        <div class="buy-info">
+                            <div class="buy-name">Busz fejlesztése</div>
+                            <div class="buy-price">$15,000</div>
+                        </div>
+                        <i class="fas fa-tools buy-icon"></i>
+                    </button>
+                    <button class="buy-btn" id="newRoute">
+                        <div class="buy-info">
+                            <div class="buy-name">Új járat indítása</div>
+                            <div class="buy-price">$10,000</div>
+                        </div>
+                        <i class="fas fa-route buy-icon"></i>
+                    </button>
+                    <button class="buy-btn" id="buyDepot">
+                        <div class="buy-info">
+                            <div class="buy-name">Járműtelep vásárlása</div>
+                            <div class="buy-price">$50,000</div>
+                        </div>
+                        <i class="fas fa-warehouse buy-icon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bus Management -->
+            <div class="control-panel">
+                <h3 class="panel-title"><i class="fas fa-bus"></i> Busz Flotta</h3>
+                <div class="buses-list" id="busesList">
+                    <!-- Buses will be added by JavaScript -->
+                </div>
+                <div id="selectedBusInfo" style="display: none;">
+                    <div class="route-info">
+                        <div class="route-stops">
+                            <div class="route-stop">
+                                <div class="route-stop-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <span id="routeStart">Kezdőállomás</span>
+                            </div>
+                            <div class="route-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                            <div class="route-stop">
+                                <div class="route-stop-icon">
+                                    <i class="fas fa-flag-checkered"></i>
+                                </div>
+                                <span id="routeEnd">Végállomás</span>
+                            </div>
+                        </div>
+                        <div class="route-stats">
+                            <div class="route-stat">
+                                <span>Utasok:</span>
+                                <span id="busPassengers">0</span>
+                            </div>
+                            <div class="route-stat">
+                                <span>Jövedelem:</span>
+                                <span id="busIncome" class="bus-profit">$0/perc</span>
+                            </div>
+                            <div class="route-stat">
+                                <span>Állapot:</span>
+                                <span id="busCondition">100%</span>
+                            </div>
+                            <div class="route-stat">
+                                <span>Következő megálló:</span>
+                                <span id="nextStop">-</span>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Üzemanyag</span>
+                                <span id="fuelPercent">80%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="fuelBar" style="width: 80%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="buy-btn" id="manageBus" style="width: 100%; margin-top: 15px;">
+                        <i class="fas fa-cog"></i>
+                        <span>Busz irányítása</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Game Messages -->
+            <div class="control-panel">
+                <h3 class="panel-title"><i class="fas fa-bullhorn"></i> Üzenetek</h3>
+                <div class="game-messages" id="gameMessages">
+                    <div class="message success">Üdvözöljük a BuszVilág játékban! Vásároljon első buszát a játék megkezdéséhez.</div>
+                    <div class="message">Kattintson a "Busz vásárlása" gombra az első busz beszerzéséhez.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Modal -->
+    <div class="game-modal" id="gameModal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modalTitle">Busz vásárlása</h2>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be filled by JavaScript -->
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="modalConfirm">Vásárlás</button>
+                <button class="modal-btn secondary" id="modalCancel">Mégse</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bus Selection Modal -->
+    <div class="game-modal" id="busSelectionModal">
+        <div class="modal-content">
+            <h2 class="modal-title">Válasszon busztípust</h2>
+            <div class="modal-body">
+                <p>Válassza ki a vásárolni kívánt busz típusát:</p>
+                <div class="bus-selection" id="busSelection">
+                    <!-- Bus options will be added by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="selectBus">Kiválasztás</button>
+                <button class="modal-btn secondary" id="cancelBusSelection">Mégse</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div class="game-modal" id="tutorialModal">
+        <div class="modal-content">
+            <h2 class="modal-title">BuszVilág - Útmutató</h2>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: var(--primary-yellow); margin-bottom: 15px;">Cél:</h3>
+                    <p>Hozzon létre egy nyereséges busztársaságot! Indítson járatokat, vásároljon új buszokat, és versenyezzen a piacon.</p>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <h4 style="color: var(--primary-blue); margin-bottom: 10px;">Játékmenet:</h4>
+                    <ol style="padding-left: 20px;">
+                        <li>Vásároljon buszokat ($20,000/db)</li>
+                        <li>Indítson járatokat a megállók között</li>
+                        <li>Gyűjtsön utasokat és generáljon bevételt</li>
+                        <li>Fejlessze buszait és indítson új járatokat</li>
+                        <li>Bővítse flottáját és dominálja a várost!</li>
+                    </ol>
+                </div>
+                
+                <div style="background-color: rgba(255, 179, 0, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary-yellow);">
+                    <p><strong>Tipp:</strong> Figyeljen az üzemanyagszintre és a buszok állapotára! Időnként karbantartásra és tankolásra van szükségük.</p>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="startGame">Játék indítása</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // BuszVilág Játék
+        document.addEventListener('DOMContentLoaded', function() {
+            // Game State
+            const gameState = {
+                money: 50000,
+                score: 0,
+                buses: [],
+                busStops: [],
+                routes: [],
+                selectedBus: null,
+                selectedBusStop: null,
+                gameTime: 60, // 1 minute in seconds
+                gameInterval: null,
+                busInterval: null,
+                nextBusId: 1,
+                nextStopId: 1,
+                fuelPrice: 100,
+                ticketPrice: 2
+            };
+
+            // DOM Elements
+            const gameMap = document.getElementById('gameMap');
+            const moneyElement = document.getElementById('money');
+            const scoreElement = document.getElementById('score');
+            const busesElement = document.getElementById('buses');
+            const timeElement = document.getElementById('time');
+            const busesList = document.getElementById('busesList');
+            const gameMessages = document.getElementById('gameMessages');
+            const selectedBusInfo = document.getElementById('selectedBusInfo');
+            const gameModal = document.getElementById('gameModal');
+            const busSelectionModal = document.getElementById('busSelectionModal');
+            const tutorialModal = document.getElementById('tutorialModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalConfirm = document.getElementById('modalConfirm');
+            const modalCancel = document.getElementById('modalCancel');
+            const startGameBtn = document.getElementById('startGame');
+            const selectBusBtn = document.getElementById('selectBus');
+            const cancelBusSelectionBtn = document.getElementById('cancelBusSelection');
+            const busSelection = document.getElementById('busSelection');
+
+            // Buy buttons
+            const buyBusBtn = document.getElementById('buyBus');
+            const upgradeBusBtn = document.getElementById('upgradeBus');
+            const newRouteBtn = document.getElementById('newRoute');
+            const buyDepotBtn = document.getElementById('buyDepot');
+            const manageBusBtn = document.getElementById('manageBus');
+
+            // Bus types
+            const busTypes = [
+                { id: 1, name: "Ikarus 280", price: 20000, capacity: 50, fuelConsumption: 0.1, speed: 1, color: "#d32f2f" },
+                { id: 2, name: "Volvo 7700", price: 35000, capacity: 70, fuelConsumption: 0.08, speed: 1.2, color: "#1565c0" },
+                { id: 3, name: "Mercedes Citaro", price: 40000, capacity: 80, fuelConsumption: 0.07, speed: 1.3, color: "#2e7d32" },
+                { id: 4, name: "Solaris Urbino", price: 45000, capacity: 90, fuelConsumption: 0.06, speed: 1.4, color: "#6a1b9a" },
+                { id: 5, name: "BYD Electric", price: 60000, capacity: 60, fuelConsumption: 0.02, speed: 1.5, color: "#00897b" }
+            ];
+
+            // Selected bus type for purchase
+            let selectedBusType = null;
+
+            // Initialize game
+            function initGame() {
+                // Create bus stops
+                createBusStops();
+                
+                // Create roads
+                createRoads();
+                
+                // Initialize game timer
+                startGameTimer();
+                
+                // Initialize bus movement
+                startBusMovement();
+                
+                // Update UI
+                updateUI();
+                
+                // Show tutorial
+                tutorialModal.style.display = 'flex';
+                
+                // Add initial message
+                addMessage("Üdvözöljük a BuszVilág játékban! Vásároljon első buszát a játék megkezdéséhez.", "success");
+            }
+
+            // Create bus stops on the map
+            function createBusStops() {
+                const stopsData = [
+                    { id: 1, name: "Belváros", x: 100, y: 200, passengers: 30 },
+                    { id: 2, name: "Pályaudvar", x: 300, y: 150, passengers: 40 },
+                    { id: 3, name: "Egyetem", x: 500, y: 250, passengers: 50 },
+                    { id: 4, name: "Kórház", x: 200, y: 350, passengers: 25 },
+                    { id: 5, name: "Bevásárlóközpont", x: 400, y: 400, passengers: 35 },
+                    { id: 6, name: "Lakótelep", x: 600, y: 350, passengers: 45 },
+                    { id: 7, name: "Iparközpont", x: 700, y: 200, passengers: 30 },
+                    { id: 8, name: "Stadion", x: 800, y: 300, passengers: 20 }
+                ];
+
+                stopsData.forEach(stop => {
+                    const stopElement = document.createElement('div');
+                    stopElement.className = 'bus-stop';
+                    stopElement.id = `stop-${stop.id}`;
+                    stopElement.style.left = `${stop.x}px`;
+                    stopElement.style.top = `${stop.y}px`;
+                    
+                    const stopNumber = document.createElement('div');
+                    stopNumber.textContent = stop.id;
+                    stopElement.appendChild(stopNumber);
+                    
+                    const stopName = document.createElement('div');
+                    stopName.className = 'bus-stop-name';
+                    stopName.textContent = stop.name;
+                    stopElement.appendChild(stopName);
+                    
+                    stopElement.addEventListener('click', () => selectBusStop(stop));
+                    
+                    gameMap.appendChild(stopElement);
+                    
+                    gameState.busStops.push({
+                        ...stop,
+                        element: stopElement,
+                        currentPassengers: stop.passengers,
+                        waitingPassengers: Math.floor(Math.random() * 10) + 5
+                    });
+                });
+            }
+
+            // Create roads between bus stops
+            function createRoads() {
+                // Define connections between stops
+                const connections = [
+                    [1, 2], [1, 4], [2, 3], [2, 5],
+                    [3, 6], [4, 5], [5, 6], [6, 7],
+                    [7, 8], [5, 8], [3, 7]
+                ];
+
+                connections.forEach(conn => {
+                    const stop1 = gameState.busStops.find(s => s.id === conn[0]);
+                    const stop2 = gameState.busStops.find(s => s.id === conn[1]);
+                    
+                    if (stop1 && stop2) {
+                        createRoad(stop1, stop2);
+                    }
+                });
+            }
+        })

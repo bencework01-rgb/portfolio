@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway Empire - Vasúti Stratégiai Játék</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1a237e;
+            --secondary-blue: #283593;
+            --accent-red: #d32f2f;
+            --accent-yellow: #ffc107;
+            --accent-green: #388e3c;
+            --dark-bg: #121212;
+            --light-bg: #f5f5f5;
+            --panel-bg: #1e1e1e;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+            --track-color: #795548;
+            --train-red: #e53935;
+            --train-blue: #1e88e5;
+            --train-green: #43a047;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Game Header */
+        .game-header {
+            background: linear-gradient(to right, var(--primary-blue), var(--secondary-blue));
+            padding: 20px 0;
+            border-bottom: 3px solid var(--accent-yellow);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--accent-yellow);
+            margin-right: 15px;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+        
+        .game-stats {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-yellow);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Main Game Container */
+        .game-container {
+            display: flex;
+            height: calc(100vh - 120px);
+            padding: 20px 0;
+        }
+        
+        /* Game Map */
+        .game-map-container {
+            flex: 3;
+            background-color: var(--panel-bg);
+            border-radius: 10px;
+            margin-right: 20px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid var(--secondary-blue);
+        }
+        
+        #gameMap {
+            width: 100%;
+            height: 100%;
+            background-color: #2c3e50;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .city {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.2s;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .city:hover {
+            transform: scale(1.2);
+            z-index: 100;
+        }
+        
+        .city-name {
+            position: absolute;
+            bottom: -25px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            text-shadow: 1px 1px 3px black;
+        }
+        
+        .track {
+            position: absolute;
+            background-color: var(--track-color);
+            border-radius: 3px;
+            z-index: 1;
+        }
+        
+        .train {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+            transition: left 1s linear, top 1s linear;
+        }
+        
+        .train-icon {
+            font-size: 1.2rem;
+        }
+        
+        /* Game Controls */
+        .game-controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .control-panel {
+            background-color: var(--panel-bg);
+            border-radius: 10px;
+            padding: 25px;
+            border: 2px solid var(--secondary-blue);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--accent-yellow);
+            display: flex;
+            align-items: center;
+        }
+        
+        .panel-title i {
+            margin-right: 10px;
+        }
+        
+        /* Build Panel */
+        .build-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .build-btn {
+            background-color: var(--secondary-blue);
+            border: none;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .build-btn:hover {
+            background-color: var(--primary-blue);
+            transform: translateY(-3px);
+        }
+        
+        .build-btn i {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--accent-yellow);
+        }
+        
+        .build-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .build-btn.disabled:hover {
+            background-color: var(--secondary-blue);
+            transform: none;
+        }
+        
+        /* Trains Panel */
+        .trains-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        
+        .train-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .train-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .train-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .train-route {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Game Messages */
+        .game-messages {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            padding: 10px;
+        }
+        
+        .message {
+            padding: 8px;
+            border-left: 3px solid var(--accent-yellow);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .message.success {
+            border-left-color: var(--accent-green);
+        }
+        
+        .message.error {
+            border-left-color: var(--accent-red);
+        }
+        
+        /* Game Modal */
+        .game-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .modal-content {
+            background-color: var(--panel-bg);
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 3px solid var(--accent-yellow);
+        }
+        
+        .modal-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--accent-yellow);
+            text-align: center;
+        }
+        
+        .modal-body {
+            margin-bottom: 30px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .modal-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-btn.primary {
+            background-color: var(--accent-yellow);
+            color: var(--dark-bg);
+        }
+        
+        .modal-btn.secondary {
+            background-color: var(--secondary-blue);
+            color: white;
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Game Tutorial */
+        .tutorial-step {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background-color: var(--accent-yellow);
+            color: var(--dark-bg);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .game-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .game-map-container {
+                margin-right: 0;
+                margin-bottom: 20px;
+                height: 60vh;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .game-stats {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 15px;
+            }
+            
+            .build-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Game Header -->
+    <header class="game-header">
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-train logo-icon"></i>
+                <div class="logo-text">RAILWAY EMPIRE</div>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="money">$500,000</div>
+                    <div class="stat-label">Tőke</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="score">0</div>
+                    <div class="stat-label">Pontszám</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="trains">0</div>
+                    <div class="stat-label">Vonatok</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="time">01:00</div>
+                    <div class="stat-label">Játékidő</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Container -->
+    <div class="container game-container">
+        <!-- Game Map -->
+        <div class="game-map-container">
+            <div id="gameMap">
+                <!-- Cities and tracks will be generated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Game Controls -->
+        <div class="game-controls">
+            <!-- Build Panel -->
+            <div class="control-panel">
+                <h3 class="panel-title"><i class="fas fa-hammer"></i> Építés</h3>
+                <div class="build-options">
+                    <button class="build-btn" id="buildTrack">
+                        <i class="fas fa-road"></i>
+                        <span>Vasúti pálya építése</span>
+                        <small>$50,000</small>
+                    </button>
+                    <button class="build-btn" id="buyTrain">
+                        <i class="fas fa-train"></i>
+                        <span>Vonat vásárlása</span>
+                        <small>$100,000</small>
+                    </button>
+                    <button class="build-btn" id="upgradeStation">
+                        <i class="fas fa-building"></i>
+                        <span>Állomás fejlesztése</span>
+                        <small>$75,000</small>
+                    </button>
+                    <button class="build-btn" id="buildBridge">
+                        <i class="fas fa-bridge"></i>
+                        <span>Híd építése</span>
+                        <small>$150,000</small>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Trains Panel -->
+            <div class="control-panel">
+                <h3 class="panel-title"><i class="fas fa-train"></i> Vonatok</h3>
+                <div class="trains-list" id="trainsList">
+                    <!-- Trains will be added by JavaScript -->
+                </div>
+                <div class="train-controls">
+                    <button class="build-btn" id="manageTrain" style="width: 100%;">
+                        <i class="fas fa-cog"></i>
+                        <span>Vonat irányítása</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Panel -->
+            <div class="control-panel">
+                <h3 class="panel-title"><i class="fas fa-bullhorn"></i> Üzenetek</h3>
+                <div class="game-messages" id="gameMessages">
+                    <div class="message success">Üdvözöljük a Railway Empire játékban! Kezdje el vasúthálózata építését!</div>
+                    <div class="message">Kattintson egy városra, majd válassza ki a "Vasúti pálya építése" opciót.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Modal -->
+    <div class="game-modal" id="gameModal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modalTitle">Vasúti pálya építése</h2>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be filled by JavaScript -->
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="modalConfirm">Megerősítés</button>
+                <button class="modal-btn secondary" id="modalCancel">Mégse</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div class="game-modal" id="tutorialModal">
+        <div class="modal-content">
+            <h2 class="modal-title">Railway Empire - Útmutató</h2>
+            <div class="modal-body">
+                <div class="tutorial-step">
+                    <span class="step-number">1</span>
+                    <strong>Cél:</strong> Hozzon létre egy nyereséges vasúthálózatot!
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">2</span>
+                    <strong>Városok:</strong> Kattintson a városokra információkért és akciókhoz.
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">3</span>
+                    <strong>Pályaépítés:</strong> Válasszon két várost, hogy vasúti pályát építsen közöttük.
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">4</span>
+                    <strong>Vonatok:</strong> Vásároljon vonatokat és állítsa be az útvonalaikat.
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">5</span>
+                    <strong>Jövedelem:</strong> Vonatok utasokat és árukat szállítanak, ami bevételt generál.
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">6</span>
+                    <strong>Figyelem:</strong> Figyeljen a költségekre és fenntartási kiadásokra!
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="startGame">Játék indítása</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Railway Empire Game
+        document.addEventListener('DOMContentLoaded', function() {
+            // Game State
+            const gameState = {
+                money: 500000,
+                score: 0,
+                trains: [],
+                cities: [],
+                tracks: [],
+                selectedCity: null,
+                selectedAction: null,
+                gameTime: 60, // 1 minute in seconds
+                gameInterval: null,
+                trainInterval: null
+            };
+
+            // DOM Elements
+            const gameMap = document.getElementById('gameMap');
+            const moneyElement = document.getElementById('money');
+            const scoreElement = document.getElementById('score');
+            const trainsElement = document.getElementById('trains');
+            const timeElement = document.getElementById('time');
+            const trainsList = document.getElementById('trainsList');
+            const gameMessages = document.getElementById('gameMessages');
+            const gameModal = document.getElementById('gameModal');
+            const tutorialModal = document.getElementById('tutorialModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalConfirm = document.getElementById('modalConfirm');
+            const modalCancel = document.getElementById('modalCancel');
+            const startGameBtn = document.getElementById('startGame');
+
+            // Build buttons
+            const buildTrackBtn = document.getElementById('buildTrack');
+            const buyTrainBtn = document.getElementById('buyTrain');
+            const upgradeStationBtn = document.getElementById('upgradeStation');
+            const buildBridgeBtn = document.getElementById('buildBridge');
+            const manageTrainBtn = document.getElementById('manageTrain');
+
+            // Initialize game
+            function initGame() {
+                // Create cities
+                createCities();
+                
+                // Initialize game timer
+                startGameTimer();
+                
+                // Initialize train movement
+                startTrainMovement();
+                
+                // Update UI
+                updateUI();
+                
+                // Show tutorial
+                tutorialModal.style.display = 'flex';
+            }
+
+            // Create cities on the map
+            function createCities() {
+                const cityData = [
+                    { id: 1, name: "Budapest", x: 150, y: 250, color: "#e53935", population: 1750000, revenue: 5000 },
+                    { id: 2, name: "Bécs", x: 100, y: 100, color: "#1e88e5", population: 1900000, revenue: 5500 },
+                    { id: 3, name: "Prága", x: 250, y: 150, color: "#43a047", population: 1300000, revenue: 4500 },
+                    { id: 4, name: "Bratislava", x: 180, y: 180, color: "#8e24aa", population: 430000, revenue: 3000 },
+                    { id: 5, name: "Zágráb", x: 120, y: 350, color: "#fb8c00", population: 800000, revenue: 3500 },
+                    { id: 6, name: "Ljubljana", x: 80, y: 300, color: "#00acc1", population: 280000, revenue: 2500 }
+                ];
+
+                cityData.forEach(city => {
+                    const cityElement = document.createElement('div');
+                    cityElement.className = 'city';
+                    cityElement.id = `city-${city.id}`;
+                    cityElement.style.left = `${city.x}px`;
+                    cityElement.style.top = `${city.y}px`;
+                    cityElement.style.backgroundColor = city.color;
+                    
+                    const cityText = document.createElement('div');
+                    cityText.textContent = city.id;
+                    cityElement.appendChild(cityText);
+                    
+                    const cityName = document.createElement('div');
+                    cityName.className = 'city-name';
+                    cityName.textContent = city.name;
+                    cityElement.appendChild(cityName);
+                    
+                    cityElement.addEventListener('click', () => selectCity(city));
+                    
+                    gameMap.appendChild(cityElement);
+                    
+                    gameState.cities.push({
+                        ...city,
+                        element: cityElement,
+                        level: 1,
+                        connectedTo: []
+                    });
+                });
+            }
+
+            // Select a city
+            function selectCity(city) {
+                if (gameState.selectedAction === 'buildTrack') {
+                    if (!gameState.selectedCity) {
+                        // First city selection
+                        gameState.selectedCity = city;
+                        addMessage(`Város kiválasztva: ${city.name}. Válasszon ki egy másik várost a pályaépítéshez.`, 'success');
+                        highlightCity(city.id, true);
+                    } else if (gameState.selectedCity.id === city.id) {
+                        // Deselect if same city clicked
+                        gameState.selectedCity = null;
+                        addMessage('Város kijelölés törölve.', 'info');
+                        highlightCity(city.id, false);
+                    } else {
+                        // Second city selected - build track
+                        const cost = 50000;
+                        if (gameState.money >= cost) {
+                            buildTrack(gameState.selectedCity, city);
+                            gameState.selectedCity = null;
+                            resetCityHighlights();
+                        } else {
+                            addMessage('Nincs elég pénze vasúti pálya építéséhez!', 'error');
+                        }
+                    }
+                } else {
+                    // Show city info
+                    showCityInfo(city);
+                }
+            }
+
+            // Highlight a city
+            function highlightCity(cityId, highlight) {
+                const cityElement = document.getElementById(`city-${cityId}`);
+                if (highlight) {
+                    cityElement.style.boxShadow = '0 0 20px 5px gold';
+                    cityElement.style.transform = 'scale(1.2)';
+                } else {
+                    cityElement.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
+                    cityElement.style.transform = 'scale(1)';
+                }
+            }
+
+            // Reset all city highlights
+            function resetCityHighlights() {
+                gameState.cities.forEach(city => {
+                    highlightCity(city.id, false);
+                });
+            }
+
+            // Build track between two cities
+            function buildTrack(city1, city2) {
+                // Check if track already exists
+                const existingTrack = gameState.tracks.find(track => 
+                    (track.city1.id === city1.id && track.city2.id === city2.id) ||
+                    (track.city1.id === city2.id && track.city2.id === city1.id)
+                );
+                
+                if (existingTrack) {
+                    addMessage('Már létezik vasúti pálya e két város között!', 'error');
+                    return;
+                }
+                
+                // Calculate distance
+                const distance = Math.sqrt(
+                    Math.pow(city2.x - city1.x, 2) + Math.pow(city2.y - city1.y, 2)
+                );
+                
+                // Deduct cost
+                const cost = 50000;
+                gameState.money -= cost;
+                
+                // Create track element
+                const trackElement = document.createElement('div');
+                trackElement.className = 'track';
+                
+                // Position and size the track
+                const x1 = city1.x + 30; // Center of city
+                const y1 = city1.y + 30;
+                const x2 = city2.x + 30;
+                const y2 = city2.y + 30;
+                
+                const length = distance;
+                const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+                
+                trackElement.style.width = `${length}px`;
+                trackElement.style.height = '8px';
+                trackElement.style.left = `${x1}px`;
+                trackElement.style.top = `${y1}px`;
+                trackElement.style.transform = `rotate(${angle}deg)`;
+                trackElement.style.transformOrigin = '0 0';
+                
+                gameMap.appendChild(trackElement);
+                
+                // Add to game state
+                gameState.tracks.push({
+                    city1: city1,
+                    city2: city2,
+                    element: trackElement,
+                    length: Math.round(distance / 10)
+                });
+                
+                // Update city connections
+                const city1Obj = gameState.cities.find(c => c.id === city1.id);
+                const city2Obj = gameState.cities.find(c => c.id === city2.id);
+                
+                city1Obj.connectedTo.push(city2.id);
+                city2Obj.connectedTo.push(city1.id);
+                
+                // Add message
+                addMessage(`Vasúti pálya építve ${city1.name} és ${city2.name} között! Költség: $${cost.toLocaleString()}`, 'success');
+                
+                // Update score
+                gameState.score += 100;
+                
+                // Update UI
+                updateUI();
+            }
+
+            // Buy a train
+            function buyTrain() {
+                const cost = 100000;
+                
+                if (gameState.money < cost) {
+                    addMessage('Nincs elég pénze vonat vásárlásához!', 'error');
+                    return;
+                }
+                
+                // Check if there are tracks to run on
+                if (gameState.tracks.length === 0) {
+                    addMessage('Először építsen vasúti pályát a vonatok számára!', 'error');
+                    return;
+                }
+                
+                // Deduct cost
+                gameState.money -= cost;
+                
+                // Create train
+                const trainColors = ['#e53935', '#1e88e5', '#43a047', '#8e24aa', '#fb8c00'];
+                const trainColor = trainColors[gameState.trains.length % trainColors.length];
+                
+                const train = {
+                    id: gameState.trains.length + 1,
+                    color: trainColor,
+                    speed: 2,
+                    route: [],
+                    currentTrack: 0,
+                    position: 0,
+                    revenue: 0,
+                    maintenance: 5000,
+                    element: null
+                };
+                
+                // Assign to a random track
+                const randomTrack = gameState.tracks[Math.floor(Math.random() * gameState.tracks.length)];
+                train.route = [randomTrack.city1, randomTrack.city2];
+                train.currentTrack = randomTrack;
+                
+                // Create train element
+                const trainElement = document.createElement('div');
+                trainElement.className = 'train';
+                trainElement.id = `train-${train.id}`;
+                trainElement.style.backgroundColor = train.color;
+                trainElement.style.left = `${randomTrack.city1.x + 15}px`;
+                trainElement.style.top = `${randomTrack.city1.y + 15}px`;
+                
+                const trainIcon = document.createElement('div');
+                trainIcon.className = 'train-icon';
+                trainIcon.innerHTML = '<i class="fas fa-train"></i>';
+                trainElement.appendChild(trainIcon);
+                
+                gameMap.appendChild(trainElement);
+                train.element = trainElement;
+                
+                // Add to game state
+                gameState.trains.push(train);
+                
+                // Add message
+                addMessage(`Vonat vásárolva! #${train.id} elindult ${randomTrack.city1.name} és ${randomTrack.city2.name} között.`, 'success');
+                
+                // Update UI
+                updateUI();
+            }
+
+            // Show city information
+            function showCityInfo(city) {
+                modalTitle.textContent = city.name;
+                
+                const connections = gameState.cities.find(c => c.id === city.id).connectedTo;
+                const connectionNames = connections.map(id => {
+                    const connectedCity = gameState.cities.find(c => c.id === id);
+                    return connectedCity ? connectedCity.name : 'Ismeretlen';
+                }).join(', ') || 'Nincsenek kapcsolatok';
+                
+                modalBody.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <p><strong>Népesség:</strong> ${city.population.toLocaleString()}</p>
+                        <p><strong>Jövedelem potenciál:</strong> $${city.revenue.toLocaleString()}/perc</p>
+                        <p><strong>Állomás szint:</strong> ${gameState.cities.find(c => c.id === city.id).level}</p>
+                        <p><strong>Kapcsolatok:</strong> ${connectionNames}</p>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom: 10px; color: #ffc107;">Várossal kapcsolatos műveletek:</h3>
+                        <button class="build-btn" onclick="upgradeCityStation(${city.id})" style="width: 100%; margin-bottom: 10px;">
+                            <i class="fas fa-level-up-alt"></i>
+                            <span>Állomás fejlesztése</span>
+                            <small>$75,000</small>
+                        </button>
+                        <button class="build-btn" onclick="setAsTrainTerminus(${city.id})" style="width: 100%;">
+                            <i class="fas fa-flag-checkered"></i>
+                            <span>Végállomás beállítása</span>
+                        </button>
+                    </div>
+                `;
+                
+                gameModal.style.display = 'flex';
+                
+                // Hide modal buttons for info display
+                modalConfirm.style.display = 'none';
+                modalCancel.textContent = 'Bezárás';
+            }
+
+            // Upgrade city station (called from modal)
+            window.upgradeCityStation = function(cityId) {
+                const cost = 75000;
+                const city = gameState.cities.find(c => c.id === cityId);
+                
+                if (gameState.money < cost) {
+                    addMessage('Nincs elég pénze az állomás fejlesztéséhez!', 'error');
+                    return;
+                }
+                
+                gameState.money -= cost;
+                city.level++;
+                city.revenue += 1000;
+                
+                addMessage(`${city.name} állomása fejlesztve ${city.level}. szintre!`, 'success');
+                
+                gameModal.style.display = 'none';
+                updateUI();
+            };
+
+            // Set city as train terminus (called from modal)
+            window.setAsTrainTerminus = function(cityId) {
+                const city = gameState.cities.find(c => c.id === cityId);
+                
+                if (gameState.trains.length === 0) {
+                    addMessage('Először vásároljon vonatot!', 'error');
+                    return;
+                }
+                
+                // Show train selection
+                showTrainSelectionForRoute(city);
+            };
+
+            // Show train selection for route setting
+            function showTrainSelectionForRoute(city) {
+                if (gameState.trains.length === 0) return;
+                
+                modalTitle.textContent = 'Vonat útvonal beállítása';
+                
+                let trainOptions = '';
+                gameState.trains.forEach(train => {
+                    const currentRoute = train.route.length > 0 ? 
+                        `${train.route[0].name} → ${train.route[1].name}` : 'Nincs útvonal';
+                    
+                    trainOptions += `
+                        <div class="train-item" style="cursor: pointer; margin-bottom: 10px;" onclick="selectTrainForRoute(${train.id}, ${city.id})">
+                            <div class="train-info">
+                                <div class="train-color" style="background-color: ${train.color};"></div>
+                                <div>
+                                    <strong>Vonat #${train.id}</strong><br>
+                                    <small>${currentRoute}</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                modalBody.innerHTML = `
+                    <p>Válasszon egy vonatot, amelynek végállomást szeretne beállítani a(z) ${city.name} városban:</p>
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        ${trainOptions}
+                    </div>
+                `;
+                
+                gameModal.style.display = 'flex';
+                modalConfirm.style.display = 'none';
+                modalCancel.textContent = 'Mégse';
+            };
+
+            // Select train for route (called from modal)
+            window.selectTrainForRoute = function(trainId, cityId) {
+                const train = gameState.trains.find(t => t.id === trainId);
+                const city = gameState.cities.find(c => c.id === cityId);
+                
+                // Check if city is connected to train's current route
+                if (train.route.length > 0) {
+                    const currentCity = train.position < 0.5 ? train.route[0] : train.route[1];
+                    const isConnected = gameState.cities.find(c => c.id === currentCity.id).connectedTo.includes(cityId);
+                    
+                    if (!isConnected) {
+                        addMessage('A város nincs összekötve a vonat jelenlegi helyével!', 'error');
+                        gameModal.style.display = 'none';
+                        return;
+                    }
+                }
+                
+                // Update train route
+                if (train.route.length === 0) {
+                    // Train has no route yet, need to select another city
+                    selectSecondCityForRoute(train, city);
+                } else {
+                    // Train has a route, add this as a stop or terminus
+                    train.route.push(city);
+                    addMessage(`Vonat #${train.id} útvonala frissítve. Új végállomás: ${city.name}`, 'success');
+                    gameModal.style.display = 'none';
+                }
+            };
+
+            // Select second city for route
+            function selectSecondCityForRoute(train, firstCity) {
+                modalTitle.textContent = 'Második város kiválasztása';
+                
+                // Find connected cities
+                const connectedCities = gameState.cities
+                    .filter(c => c.id !== firstCity.id && firstCity.connectedTo.includes(c.id))
+                    .map(c => `<div class="city-option" onclick="setTrainRoute(${train.id}, ${firstCity.id}, ${c.id})" style="padding: 10px; background: #2a2a2a; margin-bottom: 10px; border-radius: 5px; cursor: pointer;">
+                        <strong>${
